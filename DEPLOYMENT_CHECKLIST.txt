@@ -1,0 +1,132 @@
+╔══════════════════════════════════════════════════════════════╗
+║     DIGITAL DIGNITY - QUICK DEPLOYMENT CHECKLIST            ║
+╚══════════════════════════════════════════════════════════════╝
+
+📦 STEP 1: DEPLOY TO VERCEL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Option A - Use Script (Easiest):
+  □ Open Terminal
+  □ Run: chmod +x /Users/terramater/Desktop/digitaldignity-visualizations/deploy.sh
+  □ Run: /Users/terramater/Desktop/digitaldignity-visualizations/deploy.sh
+  □ Wait for "SUCCESS!" message
+
+Option B - Manual:
+  □ cd /Users/terramater/Desktop/digitaldignity-visualizations
+  □ git add .
+  □ git commit -m "Update visualizations"
+  □ git push origin main
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌐 STEP 2: GET YOUR VERCEL URL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  □ Go to: https://vercel.com/dashboard
+  □ Find: digitaldignity-visualizations project
+  □ Copy your URL (looks like: https://digitaldignity-visualizations.vercel.app)
+  
+  Write your URL here: _____________________________________________
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ STEP 3: TEST YOUR DEPLOYMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Visit these URLs and check they work:
+
+  □ https://YOUR-URL.vercel.app/
+     (Should show home page with 2 cards)
+  
+  □ https://YOUR-URL.vercel.app/stage1
+     (Should show spinning network + bar chart)
+  
+  □ https://YOUR-URL.vercel.app/stage2
+     (Should show data flow animation)
+  
+  □ https://YOUR-URL.vercel.app/embed/chart
+     (Should show JUST the bar chart, transparent background)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 STEP 4: UPDATE PRIMER MODULE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+File 1: /modules/primer-1.php (Line 18)
+  
+  FIND:
+    src="https://your-vercel-url.vercel.app/embed/chart"
+  
+  REPLACE WITH:
+    src="https://YOUR-ACTUAL-URL.vercel.app/embed/chart"
+  
+  □ Updated primer-1.php
+
+
+File 2: /assets/js/modules/primer-1.js (Lines 386 & 428)
+  
+  FIND:
+    const baseUrl = 'https://your-project.vercel.app';
+  
+  REPLACE WITH:
+    const baseUrl = 'https://YOUR-ACTUAL-URL.vercel.app';
+  
+  □ Updated primer-1.js
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⬆️  STEP 5: UPLOAD TO HOSTINGER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Via File Manager or FTP:
+
+  □ Upload: /modules/primer-1.php
+  □ Upload: /assets/js/modules/primer-1.js
+  
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧪 STEP 6: FINAL TESTING ON LIVE SITE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Visit your Hostinger site and check:
+
+Slide 1:
+  □ Shows embedded chart (not "your-vercel-url")
+  □ Chart has transparent background
+  □ New body text: "This is your intellectual property..."
+
+Slide 2:
+  □ D3 network animation working
+  □ New body text: "You see apps. They see pipelines..."
+
+Slide 3:
+  □ Money flow diagram animating
+  □ New body text: "Notice what's missing?..."
+
+Slide 4:
+  □ Abuse visualization showing
+  □ New body text: "Cambridge Analytica. 87 million users..."
+
+Slide 5:
+  □ Solution diagram with ∑ symbols
+  □ New body text: "The Everything (∑) app eliminates..."
+
+Button Logic:
+  □ "Take A Data Point Survey" button always visible
+  □ "See Your Data Economy" button NOT visible initially
+  □ Complete survey → "See Your Data Economy" button appears
+  □ Button opens Data Economy page correctly
+
+Navigation:
+  □ Pagination dots work (1-5)
+  □ Arrow keys navigate slides
+  □ Auto-advance works (5 seconds)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎉 COMPLETE! ALL DONE!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+If everything above is checked ✅, your deployment is successful!
+
+Need help? See: COMPLETE_DEPLOYMENT_GUIDE.md
