@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import DataVisualizationStage1 from './components/DataVisualizationStage1';
 import DataVisualizationStage2 from './components/DataVisualizationStage2';
+import EmbedDataChart from './components/EmbedDataChart';
 import './App.css';
 
 // Home page component
@@ -170,6 +171,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/stage1" element={<DataVisualizationStage1 />} />
           <Route path="/stage2" element={<DataVisualizationStage2 />} />
+          <Route path="/embed/chart" element={<EmbedDataChart />} />
         </Routes>
       </div>
     </Router>
