@@ -1,0 +1,22 @@
+# .htaccess for React Router on Hostinger
+# Place this file in the same directory as your index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # If the request is not for a file or directory
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  
+  # Rewrite all requests to index.html
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Prevent directory browsing
+Options -Indexes
+
+# Enable CORS (if needed for embedding)
+<IfModule mod_headers.c>
+  Header set Access-Control-Allow-Origin "*"
+</IfModule>
