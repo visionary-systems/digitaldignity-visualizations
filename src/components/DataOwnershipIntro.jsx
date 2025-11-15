@@ -1,26 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Info } from 'lucide-react';
 import { Bar, BarChart, Line, LineChart, Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const DataOwnershipIntro = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [animate, setAnimate] = useState(false);
 
+  // Override body background when component mounts
   useEffect(() => {
-    setAnimate(true);
-    const timer = setTimeout(() => setAnimate(false), 600);
-    return () => clearTimeout(timer);
-  }, [currentSlide]);
+    document.body.style.background = 'transparent';
+    document.body.style.overflow = 'hidden';
+    const appDiv = document.querySelector('.App');
+    if (appDiv) {
+      appDiv.style.background = 'transparent';
+      appDiv.style.minHeight = '100vh';
+    }
+    
+    return () => {
+      document.body.style.background = '';
+      document.body.style.overflow = '';
+    };
+  }, []);
 
-  // Custom Tooltip Component - Minimal white style
+  // Tooltip
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white/10 backdrop-blur-md border border-white/30 rounded-lg p-3 shadow-lg">
-          <p className="font-bold text-white mb-2">{label}</p>
+        <div style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.95)',
+          border: '2px solid #ff8c00',
+          borderRadius: '8px',
+          padding: '10px 14px',
+        }}>
+          <p style={{ color: '#fff', fontWeight: 'bold', marginBottom: '6px', fontSize: '14px' }}>{label}</p>
           {payload.map((entry, index) => (
-            <p key={index} className="text-sm text-white/90">
-              <span className="font-semibold">{entry.name}:</span> {entry.value}
+            <p key={index} style={{ color: '#fff', fontSize: '13px', margin: '2px 0' }}>
+              {entry.name}: <span style={{ color: '#ff8c00', fontWeight: 'bold' }}>{entry.value}</span>
             </p>
           ))}
         </div>
@@ -29,7 +43,7 @@ const DataOwnershipIntro = () => {
     return null;
   };
 
-  // Data sets
+  // Data
   const marketGrowthData = [
     { year: '2023', value: 327 },
     { year: '2024', value: 450 },
@@ -102,20 +116,21 @@ const DataOwnershipIntro = () => {
     {
       title: "The Data Economy: $450B → $1.5 Trillion by 2030",
       subtitle: "A market bigger than the entire advertising industry is being built on your data",
+      source: "https://www.marketsandmarkets.com/Market-Reports/big-data-market-1068.html",
       chart: (
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={marketGrowthData}>
             <defs>
               <linearGradient id="marketGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#fff" stopOpacity={0.4}/>
-                <stop offset="95%" stopColor="#fff" stopOpacity={0.05}/>
+                <stop offset="5%" stopColor="#fff" stopOpacity={0.6}/>
+                <stop offset="95%" stopColor="#ff8c00" stopOpacity={0.2}/>
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Area type="monotone" dataKey="value" name="Market Value ($B)" stroke="#fff" strokeWidth={2} fillOpacity={1} fill="url(#marketGradient)" />
+            <Area type="monotone" dataKey="value" name="Market Value ($B)" stroke="#ff8c00" strokeWidth={3} fillOpacity={1} fill="url(#marketGradient)" />
           </AreaChart>
         </ResponsiveContainer>
       )
@@ -123,18 +138,20 @@ const DataOwnershipIntro = () => {
     {
       title: "Your Data Generates $700-2,000/Year. You Get: $0",
       subtitle: "Tech giants monetize your data while you receive nothing",
+      source: "https://www.statista.com/statistics/arpu-facebook-google/",
       chart: (
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart data={userValueData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="platform" stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+            <XAxis dataKey="platform" stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="value" name="Annual Value ($)" radius={[8, 8, 0, 0]}>
               {userValueData.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
-                  fill={index === userValueData.length - 1 ? '#fff' : `rgba(255, 255, 255, ${0.3 + index * 0.15})`} 
+                  fill={index === userValueData.length - 1 ? '#ff8c00' : '#fff'} 
+                  fillOpacity={index === userValueData.length - 1 ? 1 : 0.8}
                 />
               ))}
             </Bar>
@@ -145,14 +162,15 @@ const DataOwnershipIntro = () => {
     {
       title: "Big Tech Extracts $1.36 Billion Daily From User Data",
       subtitle: "Every single day, billions flow from your data to their profits",
+      source: "https://investor.fb.com/financials/",
       chart: (
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart data={dailyProfitsData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="company" stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+            <XAxis dataKey="company" stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="daily" name="Daily Profit ($M)" fill="rgba(255,255,255,0.5)" stroke="#fff" strokeWidth={2} radius={[8, 8, 0, 0]} />
+            <Bar dataKey="daily" name="Daily Profit ($M)" fill="#fff" fillOpacity={0.8} stroke="#ff8c00" strokeWidth={2} radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       )
@@ -160,15 +178,16 @@ const DataOwnershipIntro = () => {
     {
       title: "100% Value Extraction, 0% User Compensation",
       subtitle: "The most one-sided economic relationship in history",
+      source: "https://www.eff.org/issues/privacy",
       chart: (
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart data={ownershipGapData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="category" stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+            <XAxis dataKey="category" stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="user" stackId="a" fill="rgba(255,255,255,0.4)" name="User Share" radius={[0, 0, 0, 0]} />
-            <Bar dataKey="company" stackId="a" fill="rgba(255,255,255,0.8)" name="Company Share" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="user" stackId="a" fill="#fff" fillOpacity={0.5} name="User Share" radius={[0, 0, 0, 0]} />
+            <Bar dataKey="company" stackId="a" fill="#ff8c00" name="Company Share" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       )
@@ -176,29 +195,29 @@ const DataOwnershipIntro = () => {
     {
       title: "AI + Data Markets Racing to $4 Trillion Combined",
       subtitle: "Two massive markets converging around one resource: your data",
+      source: "https://www.grandviewresearch.com/industry-analysis/artificial-intelligence-ai-market",
       chart: (
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height="100%">
           <LineChart data={aiDataConvergence}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
             <Tooltip content={<CustomTooltip />} />
             <Line 
               type="monotone" 
               dataKey="ai" 
               name="AI Market ($B)"
-              stroke="#fff" 
-              strokeWidth={3} 
-              strokeDasharray="5 5" 
-              dot={{ r: 6, fill: '#fff', strokeWidth: 2, stroke: 'transparent' }} 
+              stroke="#ff8c00" 
+              strokeWidth={4} 
+              dot={{ r: 7, fill: '#ff8c00', strokeWidth: 2, stroke: '#fff' }} 
             />
             <Line 
               type="monotone" 
               dataKey="data" 
               name="Data Market ($B)"
-              stroke="rgba(255,255,255,0.6)" 
-              strokeWidth={3} 
-              dot={{ r: 6, fill: 'rgba(255,255,255,0.6)', strokeWidth: 2, stroke: 'transparent' }} 
+              stroke="#fff" 
+              strokeWidth={4} 
+              dot={{ r: 7, fill: '#fff', strokeWidth: 2, stroke: '#ff8c00' }} 
             />
           </LineChart>
         </ResponsiveContainer>
@@ -207,15 +226,16 @@ const DataOwnershipIntro = () => {
     {
       title: "Top Data-Driven Industries: 2024 vs 2030",
       subtitle: "Every industry is racing to monetize data—without sharing profits",
+      source: "https://www.idc.com/getdoc.jsp?containerId=prUS48165721",
       chart: (
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart data={industryData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="industry" stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+            <XAxis dataKey="industry" stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="current" name="2024 ($B)" fill="rgba(255,255,255,0.4)" stroke="rgba(255,255,255,0.6)" strokeWidth={1} radius={[8, 8, 0, 0]} />
-            <Bar dataKey="projected2030" name="2030 ($B)" fill="rgba(255,255,255,0.6)" stroke="#fff" strokeWidth={2} radius={[8, 8, 0, 0]} />
+            <Bar dataKey="current" name="2024 ($B)" fill="#fff" fillOpacity={0.6} stroke="#fff" strokeWidth={1} radius={[8, 8, 0, 0]} />
+            <Bar dataKey="projected2030" name="2030 ($B)" fill="#ff8c00" stroke="#ff8c00" strokeWidth={2} radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       )
@@ -223,16 +243,17 @@ const DataOwnershipIntro = () => {
     {
       title: "76% Want Data Ownership. 89% See No Benefits.",
       subtitle: "The disconnect between what people want and what they receive",
+      source: "https://www.pewresearch.org/internet/2019/11/15/americans-and-privacy-concerned-confused-and-feeling-lack-of-control-over-their-personal-information/",
       chart: (
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart data={awarenessData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="metric" stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
-            <YAxis domain={[0, 100]} stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+            <XAxis dataKey="metric" stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
+            <YAxis domain={[0, 100]} stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="percent" name="Percentage" radius={[8, 8, 0, 0]}>
               {awarenessData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.percent > 50 ? 'rgba(255,255,255,0.6)' : '#fff'} />
+                <Cell key={`cell-${index}`} fill={entry.percent > 50 ? '#fff' : '#ff8c00'} fillOpacity={0.9} />
               ))}
             </Bar>
           </BarChart>
@@ -242,15 +263,16 @@ const DataOwnershipIntro = () => {
     {
       title: "Platform Revenue Per User Growing 17-22% Yearly",
       subtitle: "They're getting richer from your data every single year",
+      source: "https://www.statista.com/statistics/251328/facebooks-average-revenue-per-user/",
       chart: (
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height="100%">
           <LineChart data={arpuGrowthData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Line type="monotone" dataKey="meta" name="Meta ARPU ($)" stroke="rgba(255,255,255,0.6)" strokeWidth={3} dot={{ r: 7, fill: 'rgba(255,255,255,0.6)', strokeWidth: 2, stroke: 'transparent' }} />
-            <Line type="monotone" dataKey="google" name="Google ARPU ($)" stroke="#fff" strokeWidth={3} dot={{ r: 7, fill: '#fff', strokeWidth: 2, stroke: 'transparent' }} />
+            <Line type="monotone" dataKey="meta" name="Meta ARPU ($)" stroke="#fff" strokeWidth={4} dot={{ r: 8, fill: '#fff', strokeWidth: 2, stroke: '#ff8c00' }} />
+            <Line type="monotone" dataKey="google" name="Google ARPU ($)" stroke="#ff8c00" strokeWidth={4} dot={{ r: 8, fill: '#ff8c00', strokeWidth: 2, stroke: '#fff' }} />
           </LineChart>
         </ResponsiveContainer>
       )
@@ -258,19 +280,21 @@ const DataOwnershipIntro = () => {
     {
       title: "Your Data's 10-Year Value: Up to $20,000",
       subtitle: "Imagine what you could do with that money in your pocket",
+      source: "https://www.weforum.org/agenda/2020/01/personal-data-values-worth/",
       chart: (
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart data={tenYearValueData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="scenario" stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 13, fontWeight: 600 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+            <XAxis dataKey="scenario" stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 14, fontWeight: 600 }} />
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="value" name="10-Year Value ($)" radius={[8, 8, 0, 0]}>
               {tenYearValueData.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
-                  fill={index === 0 ? 'rgba(255,255,255,0.4)' : index === 1 ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.8)'} 
-                  stroke="#fff" 
+                  fill={index === 2 ? '#ff8c00' : '#fff'} 
+                  fillOpacity={index === 2 ? 1 : 0.6}
+                  stroke={index === 2 ? '#ff8c00' : '#fff'} 
                   strokeWidth={2} 
                 />
               ))}
@@ -283,80 +307,212 @@ const DataOwnershipIntro = () => {
 
   const currentSlideData = slides[currentSlide];
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
   return (
-    <div className="min-h-screen bg-transparent p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Main Content Card */}
-        <div 
-          className="bg-white/5 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-2xl border border-white/10 transition-transform duration-300"
-          style={{ transform: animate ? 'scale(0.98)' : 'scale(1)' }}
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      background: 'transparent',
+      padding: '0',
+      margin: '0',
+      overflow: 'hidden',
+      zIndex: 9999
+    }}>
+      {/* Title at top - 150px padding to avoid nav overlap */}
+      <div style={{
+        padding: '150px 60px 10px 60px',
+        textAlign: 'center'
+      }}>
+        <h1 style={{
+          fontSize: 'clamp(28px, 4vw, 52px)',
+          fontWeight: '900',
+          color: '#fff',
+          margin: '0',
+          textShadow: '0 2px 20px rgba(0,0,0,0.9), 0 4px 40px rgba(0,0,0,0.8)',
+          lineHeight: '1.2'
+        }}>
+          {currentSlideData.title}
+        </h1>
+      </div>
+
+      {/* Chart - max 60% of vertical height */}
+      <div style={{
+        width: '100%',
+        height: '60vh',
+        maxHeight: '60vh',
+        padding: '0 60px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        {currentSlideData.chart}
+      </div>
+
+      {/* Subtitle - closer to chart */}
+      <div style={{
+        padding: '5px 60px 10px 60px',
+        textAlign: 'center'
+      }}>
+        <p style={{
+          fontSize: 'clamp(16px, 2vw, 22px)',
+          color: '#fff',
+          margin: '0',
+          textShadow: '0 2px 8px rgba(0,0,0,0.9)',
+          opacity: 0.95
+        }}>
+          {currentSlideData.subtitle}
+        </p>
+        
+        {/* Source link with info icon */}
+        <a 
+          href={currentSlideData.source} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            marginTop: '8px',
+            color: 'rgba(255, 140, 0, 0.8)',
+            fontSize: '14px',
+            textDecoration: 'none',
+            transition: 'all 0.3s'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.color = '#ff8c00';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.color = 'rgba(255, 140, 0, 0.8)';
+          }}
         >
-          {/* Title */}
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-white mb-3 leading-tight">
-            {currentSlideData.title}
-          </h2>
-          
-          {/* Subtitle */}
-          <p className="text-base md:text-lg lg:text-xl text-white/80 mb-6 font-medium">
-            {currentSlideData.subtitle}
-          </p>
+          <Info size={16} />
+          <span>Source</span>
+        </a>
+      </div>
 
-          {/* Chart */}
-          <div className="mb-4">
-            {currentSlideData.chart}
-          </div>
-        </div>
-
-        {/* Navigation Controls */}
-        <div className="flex justify-center items-center mt-6 gap-6">
-          {/* Previous Button */}
+      {/* Navigation - 100px bottom padding */}
+      <div style={{
+        padding: '20px 60px 100px 60px',
+        textAlign: 'center'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '30px'
+        }}>
           <button
-            onClick={prevSlide}
-            className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-white/30 rounded-full w-14 h-14 flex items-center justify-center cursor-pointer transition-all duration-300 shadow-lg hover:scale-110"
-            aria-label="Previous slide"
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
+            style={{
+              background: 'rgba(255, 255, 255, 0.15)',
+              border: '2px solid rgba(255, 255, 255, 0.4)',
+              borderRadius: '50%',
+              width: '54px',
+              height: '54px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.3s',
+              backdropFilter: 'blur(10px)'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 140, 0, 0.4)';
+              e.currentTarget.style.borderColor = '#ff8c00';
+              e.currentTarget.style.transform = 'scale(1.1)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
           >
-            <ChevronLeft size={28} strokeWidth={3} color="white" />
+            <ChevronLeft size={30} color="white" strokeWidth={3} />
           </button>
 
-          {/* Indicators */}
-          <div className="flex gap-2">
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  currentSlide === index 
-                    ? 'w-10 bg-white' 
-                    : 'w-2 bg-white/40 hover:bg-white/60'
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
+                style={{
+                  height: '10px',
+                  width: currentSlide === index ? '36px' : '10px',
+                  borderRadius: '5px',
+                  background: currentSlide === index ? '#ff8c00' : 'rgba(255, 255, 255, 0.5)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}
               />
             ))}
           </div>
 
-          {/* Next Button */}
           <button
-            onClick={nextSlide}
-            className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-white/30 rounded-full w-14 h-14 flex items-center justify-center cursor-pointer transition-all duration-300 shadow-lg hover:scale-110"
-            aria-label="Next slide"
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
+            style={{
+              background: 'rgba(255, 255, 255, 0.15)',
+              border: '2px solid rgba(255, 255, 255, 0.4)',
+              borderRadius: '50%',
+              width: '54px',
+              height: '54px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.3s',
+              backdropFilter: 'blur(10px)'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 140, 0, 0.4)';
+              e.currentTarget.style.borderColor = '#ff8c00';
+              e.currentTarget.style.transform = 'scale(1.1)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
           >
-            <ChevronRight size={28} strokeWidth={3} color="white" />
+            <ChevronRight size={30} color="white" strokeWidth={3} />
           </button>
         </div>
-
-        {/* Slide Counter */}
-        <div className="text-center mt-4 text-white/80 text-base font-semibold">
-          {currentSlide + 1} / {slides.length}
-        </div>
       </div>
+
+      {/* Scroll down icon at very bottom */}
+      <div style={{
+        position: 'absolute',
+        bottom: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '8px',
+        opacity: 0.7,
+        animation: 'bounce 2s infinite'
+      }}>
+        <span style={{
+          color: '#fff',
+          fontSize: '14px',
+          textShadow: '0 2px 8px rgba(0,0,0,0.9)'
+        }}>
+          Scroll to continue
+        </span>
+        <ChevronDown size={24} color="white" strokeWidth={3} />
+      </div>
+
+      <style>{`
+        @keyframes bounce {
+          0%, 100% { transform: translateX(-50%) translateY(0); }
+          50% { transform: translateX(-50%) translateY(8px); }
+        }
+      `}</style>
     </div>
   );
 };
