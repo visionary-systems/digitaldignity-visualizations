@@ -1,9 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import DataVisualizationStage1 from './components/DataVisualizationStage1';
 import DataVisualizationStage2 from './components/DataVisualizationStage2';
 import EmbedDataChart from './components/EmbedDataChart';
+import DataOwnershipIntro from './components/DataOwnershipIntro';
 import './App.css';
 
 // Home page component
@@ -162,17 +163,30 @@ const HomePage = () => {
   );
 };
 
+// Wrapper to conditionally show Navigation
+const AppContent = () => {
+  const location = useLocation();
+  const hideNavigation = location.pathname === '/data-ownership-intro';
+
+  return (
+    <>
+      {!hideNavigation && <Navigation />}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/stage1" element={<DataVisualizationStage1 />} />
+        <Route path="/stage2" element={<DataVisualizationStage2 />} />
+        <Route path="/embed/chart" element={<EmbedDataChart />} />
+        <Route path="/data-ownership-intro" element={<DataOwnershipIntro />} />
+      </Routes>
+    </>
+  );
+};
+
 function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <div className="App">
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/stage1" element={<DataVisualizationStage1 />} />
-          <Route path="/stage2" element={<DataVisualizationStage2 />} />
-          <Route path="/embed/chart" element={<EmbedDataChart />} />
-        </Routes>
+      <div className="App" style={{ background: 'transparent' }}>
+        <AppContent />
       </div>
     </Router>
   );

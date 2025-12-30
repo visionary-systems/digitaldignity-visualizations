@@ -4,8 +4,6 @@ import { Bar, BarChart, Line, LineChart, Area, AreaChart, XAxis, YAxis, Cartesia
 
 const DataOwnershipIntro = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [isTablet, setIsTablet] = useState(window.innerWidth > 768 && window.innerWidth <= 1024);
 
   // Override body background when component mounts
   useEffect(() => {
@@ -17,27 +15,9 @@ const DataOwnershipIntro = () => {
       appDiv.style.minHeight = '100vh';
     }
     
-    // Handle resize events for responsive behavior
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-      setIsTablet(window.innerWidth > 768 && window.innerWidth <= 1024);
-    };
-    
-    // Listen for reset messages from parent iframe
-    const handleMessage = (event) => {
-      if (event.data && event.data.type === 'resetSlideshow') {
-        setCurrentSlide(0);
-      }
-    };
-    
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('message', handleMessage);
-    
     return () => {
       document.body.style.background = '';
       document.body.style.overflow = '';
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('message', handleMessage);
     };
   }, []);
 
@@ -395,41 +375,31 @@ const DataOwnershipIntro = () => {
     }}>
       {/* Title at top - two lines, line 1=90pt, line 2=60pt, max-width 1200px */}
       <div style={{
-        padding: isMobile 
-          ? 'clamp(30px, 8vh, 80px) 20px 10px 20px' 
-          : isTablet 
-            ? 'clamp(40px, 10vh, 120px) 30px 15px 30px'
-            : 'clamp(60px, 15vh, 180px) 60px 20px 60px',
+        padding: '180px 60px 20px 60px',
         textAlign: 'center',
         display: 'flex',
         justifyContent: 'center'
       }}>
         <div style={{ maxWidth: '1200px', width: '100%' }}>
           <h1 style={{
-            fontSize: isMobile ? 'clamp(22px, 5.5vw, 36px)' : 'clamp(36px, 6.5vw, 85px)',
+            fontSize: 'clamp(36px, 6vw, 90px)',
             fontWeight: '900',
             color: '#fff',
             margin: '0',
-            textShadow: '0 2px 15px rgba(0,0,0,0.45), 0 4px 30px rgba(0,0,0,0.35)',
-            lineHeight: isMobile ? '1.1' : '70pt',
-            letterSpacing: isMobile ? '-1px' : '-3px',
-            whiteSpace: isMobile ? 'normal' : 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'clip'
+            textShadow: '0 4px 30px rgba(0,0,0,0.9), 0 8px 60px rgba(0,0,0,0.7)',
+            lineHeight: '1.1',
+            letterSpacing: '-2px'
           }}>
             {currentSlideData.title}
           </h1>
           <h1 style={{
-            fontSize: isMobile ? 'clamp(18px, 4.5vw, 28px)' : 'clamp(28px, 5vw, 65px)',
+            fontSize: 'clamp(24px, 4vw, 60px)',
             fontWeight: '900',
             color: '#fff',
             margin: '0',
-            textShadow: '0 2px 15px rgba(0,0,0,0.45), 0 4px 30px rgba(0,0,0,0.35)',
-            lineHeight: isMobile ? '1.2' : 'calc(clamp(28px, 5vw, 65px) + 4pt)',
-            letterSpacing: isMobile ? '-1px' : '-3px',
-            whiteSpace: isMobile ? 'normal' : 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'clip'
+            textShadow: '0 4px 30px rgba(0,0,0,0.9), 0 8px 60px rgba(0,0,0,0.7)',
+            lineHeight: '1.1',
+            letterSpacing: '-2px'
           }}>
             {currentSlideData.title2}
           </h1>
@@ -439,9 +409,9 @@ const DataOwnershipIntro = () => {
       {/* Chart - max 1200px width, centered */}
       <div style={{
         width: '100%',
-        height: isMobile ? '40vh' : isTablet ? '50vh' : '60vh',
-        maxHeight: isMobile ? '40vh' : isTablet ? '50vh' : '60vh',
-        padding: isMobile ? '0 15px' : isTablet ? '0 30px' : '0 60px',
+        height: '60vh',
+        maxHeight: '60vh',
+        padding: '0 60px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -457,12 +427,12 @@ const DataOwnershipIntro = () => {
 
       {/* Subtitle with inline circled info icon - 16px on 24pt line spacing */}
       <div style={{
-        padding: isMobile ? '5px 20px 8px 20px' : isTablet ? '5px 30px 10px 30px' : '5px 60px 10px 60px',
+        padding: '5px 60px 10px 60px',
         textAlign: 'center'
       }}>
         <p style={{
-          fontSize: isMobile ? 'clamp(11pt, 3vw, 14pt)' : 'clamp(14pt, 2vw, 18pt)',
-          lineHeight: isMobile ? 'clamp(14pt, 3.5vw, 18pt)' : 'clamp(20pt, 2.5vw, 24pt)',
+          fontSize: '16px',
+          lineHeight: '24pt',
           color: '#fff',
           margin: '0',
           textShadow: '0 2px 8px rgba(0,0,0,0.9)',
@@ -510,20 +480,16 @@ const DataOwnershipIntro = () => {
         </p>
       </div>
 
-      {/* Navigation - responsive bottom padding */}
+      {/* Navigation - 100px bottom padding */}
       <div style={{
-        padding: isMobile 
-          ? '10px 20px clamp(20px, 5vh, 50px) 20px' 
-          : isTablet 
-            ? '15px 30px clamp(30px, 6vh, 70px) 30px'
-            : '20px 60px clamp(40px, 8vh, 100px) 60px',
+        padding: '20px 60px 100px 60px',
         textAlign: 'center'
       }}>
         <div style={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          gap: isMobile ? '15px' : '30px'
+          gap: '30px'
         }}>
           <button
             onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
@@ -531,8 +497,8 @@ const DataOwnershipIntro = () => {
               background: 'rgba(255, 255, 255, 0.15)',
               border: '2px solid rgba(255, 255, 255, 0.4)',
               borderRadius: '50%',
-              width: isMobile ? '40px' : '54px',
-              height: isMobile ? '40px' : '54px',
+              width: '54px',
+              height: '54px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -551,18 +517,18 @@ const DataOwnershipIntro = () => {
               e.currentTarget.style.transform = 'scale(1)';
             }}
           >
-            <ChevronLeft size={isMobile ? 22 : 30} color="white" strokeWidth={3} />
+            <ChevronLeft size={30} color="white" strokeWidth={3} />
           </button>
 
-          <div style={{ display: 'flex', gap: isMobile ? '8px' : '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
                 style={{
-                  height: isMobile ? '8px' : '10px',
-                  width: currentSlide === index ? (isMobile ? '24px' : '36px') : (isMobile ? '8px' : '10px'),
-                  borderRadius: isMobile ? '4px' : '5px',
+                  height: '10px',
+                  width: currentSlide === index ? '36px' : '10px',
+                  borderRadius: '5px',
                   background: currentSlide === index ? '#ff8c00' : 'rgba(255, 255, 255, 0.5)',
                   border: 'none',
                   cursor: 'pointer',
@@ -578,8 +544,8 @@ const DataOwnershipIntro = () => {
               background: 'rgba(255, 255, 255, 0.15)',
               border: '2px solid rgba(255, 255, 255, 0.4)',
               borderRadius: '50%',
-              width: isMobile ? '40px' : '54px',
-              height: isMobile ? '40px' : '54px',
+              width: '54px',
+              height: '54px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -598,18 +564,18 @@ const DataOwnershipIntro = () => {
               e.currentTarget.style.transform = 'scale(1)';
             }}
           >
-            <ChevronRight size={isMobile ? 22 : 30} color="white" strokeWidth={3} />
+            <ChevronRight size={30} color="white" strokeWidth={3} />
           </button>
         </div>
       </div>
 
-      {/* Floating down arrow only (no text) - hidden on mobile/tablet where Continue button is used */}
+      {/* Floating down arrow only (no text) */}
       <div style={{
         position: 'absolute',
-        bottom: isMobile ? '60px' : '20px',
+        bottom: '20px',
         left: '50%',
         transform: 'translateX(-50%)',
-        display: (isMobile || isTablet) ? 'none' : 'flex',
+        display: 'flex',
         alignItems: 'center',
         opacity: 0.7,
         animation: 'bounce 2s infinite'
