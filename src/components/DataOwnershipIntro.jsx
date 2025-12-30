@@ -4,39 +4,61 @@ import { Bar, BarChart, Line, LineChart, Area, AreaChart, XAxis, YAxis, Cartesia
 
 const DataOwnershipIntro = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [isTablet, setIsTablet] = useState(window.innerWidth > 768 && window.innerWidth <= 1024);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
 
-  // Override body background when component mounts
+  // Device detection on mount and resize
   useEffect(() => {
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      // Detect touch capability for tablets
+      const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      
+      setIsMobile(width <= 768);
+      setIsTablet((width > 768 && width <= 1366 && isTouch) || (width > 768 && width <= 1024));
+      setViewportHeight(height);
+      
+      console.log('DataOwnershipIntro: Device check - width:', width, 'height:', height, 'mobile:', width <= 768, 'tablet:', (width > 768 && width <= 1366 && isTouch));
+    };
+    
+    checkDevice();
+    
     document.body.style.background = 'transparent';
     document.body.style.overflow = 'hidden';
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+    
+    const htmlEl = document.documentElement;
+    if (htmlEl) {
+      htmlEl.style.overflow = 'hidden';
+    }
+    
     const appDiv = document.querySelector('.App');
     if (appDiv) {
       appDiv.style.background = 'transparent';
       appDiv.style.minHeight = '100vh';
+      appDiv.style.maxHeight = '100vh';
+      appDiv.style.overflow = 'hidden';
     }
-    
-    // Handle resize events for responsive behavior
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-      setIsTablet(window.innerWidth > 768 && window.innerWidth <= 1024);
-    };
     
     // Listen for reset messages from parent iframe
     const handleMessage = (event) => {
       if (event.data && event.data.type === 'resetSlideshow') {
+        console.log('DataOwnershipIntro: Received reset message');
         setCurrentSlide(0);
       }
     };
     
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', checkDevice);
     window.addEventListener('message', handleMessage);
     
     return () => {
       document.body.style.background = '';
       document.body.style.overflow = '';
-      window.removeEventListener('resize', handleResize);
+      if (htmlEl) htmlEl.style.overflow = '';
+      window.removeEventListener('resize', checkDevice);
       window.removeEventListener('message', handleMessage);
     };
   }, []);
@@ -49,12 +71,12 @@ const DataOwnershipIntro = () => {
           backgroundColor: 'rgba(0, 0, 0, 0.95)',
           border: '2px solid #ff8c00',
           borderRadius: '12px',
-          padding: '12px 16px',
+          padding: isMobile ? '8px 12px' : '12px 16px',
           boxShadow: '0 8px 32px rgba(255, 140, 0, 0.4)'
         }}>
-          <p style={{ color: '#fff', fontWeight: 'bold', marginBottom: '8px', fontSize: '15px' }}>{label}</p>
+          <p style={{ color: '#fff', fontWeight: 'bold', marginBottom: '6px', fontSize: isMobile ? '12px' : '14px' }}>{label}</p>
           {payload.map((entry, index) => (
-            <p key={index} style={{ color: '#fff', fontSize: '14px', margin: '4px 0' }}>
+            <p key={index} style={{ color: '#fff', fontSize: isMobile ? '11px' : '13px', margin: '3px 0' }}>
               {entry.name}: <span style={{ color: '#ff8c00', fontWeight: 'bold' }}>{entry.value}</span>
             </p>
           ))}
@@ -119,6 +141,8 @@ const DataOwnershipIntro = () => {
     { scenario: 'Actual', value: 20000 }
   ];
 
+  const tickFontSize = isMobile ? 10 : isTablet ? 12 : 14;
+
   const slides = [
     {
       title: "The Data Economy:",
@@ -143,15 +167,15 @@ const DataOwnershipIntro = () => {
               </filter>
             </defs>
             <CartesianGrid strokeDasharray="5 5" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
+            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <Tooltip content={<CustomTooltip />} />
             <Area 
               type="monotone" 
               dataKey="value" 
               name="Market Value ($B)" 
               stroke="#ff8c00" 
-              strokeWidth={4} 
+              strokeWidth={3} 
               fillOpacity={1} 
               fill="url(#marketGradient)"
               filter="url(#glow)"
@@ -175,16 +199,16 @@ const DataOwnershipIntro = () => {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="5 5" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="company" stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
+            <XAxis dataKey="company" stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <Tooltip content={<CustomTooltip />} />
             <Bar 
               dataKey="daily" 
               name="Daily Profit ($M)" 
               fill="url(#barGradient)" 
               stroke="#ff8c00" 
-              strokeWidth={3} 
-              radius={[12, 12, 0, 0]}
+              strokeWidth={2} 
+              radius={[8, 8, 0, 0]}
             />
           </BarChart>
         </ResponsiveContainer>
@@ -209,11 +233,11 @@ const DataOwnershipIntro = () => {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="5 5" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="category" stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
+            <XAxis dataKey="category" stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="user" stackId="a" fill="url(#userGradient)" name="User Share" radius={[0, 0, 0, 0]} stroke="#fff" strokeWidth={2} />
-            <Bar dataKey="company" stackId="a" fill="url(#companyGradient)" name="Company Share" radius={[12, 12, 0, 0]} stroke="#ff8c00" strokeWidth={2} />
+            <Bar dataKey="company" stackId="a" fill="url(#companyGradient)" name="Company Share" radius={[8, 8, 0, 0]} stroke="#ff8c00" strokeWidth={2} />
           </BarChart>
         </ResponsiveContainer>
       )
@@ -236,16 +260,16 @@ const DataOwnershipIntro = () => {
               </filter>
             </defs>
             <CartesianGrid strokeDasharray="5 5" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
+            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <Tooltip content={<CustomTooltip />} />
             <Line 
               type="monotone" 
               dataKey="ai" 
               name="AI Market ($B)"
               stroke="#ff8c00" 
-              strokeWidth={5} 
-              dot={{ r: 9, fill: '#ff8c00', strokeWidth: 3, stroke: '#fff' }} 
+              strokeWidth={4} 
+              dot={{ r: 6, fill: '#ff8c00', strokeWidth: 2, stroke: '#fff' }} 
               filter="url(#lineGlow)"
             />
             <Line 
@@ -253,8 +277,8 @@ const DataOwnershipIntro = () => {
               dataKey="data" 
               name="Data Market ($B)"
               stroke="#fff" 
-              strokeWidth={5} 
-              dot={{ r: 9, fill: '#fff', strokeWidth: 3, stroke: '#ff8c00' }} 
+              strokeWidth={4} 
+              dot={{ r: 6, fill: '#fff', strokeWidth: 2, stroke: '#ff8c00' }} 
               filter="url(#lineGlow)"
             />
           </LineChart>
@@ -280,11 +304,11 @@ const DataOwnershipIntro = () => {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="5 5" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="industry" stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
+            <XAxis dataKey="industry" stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="current" name="2024 ($B)" fill="url(#current2024)" stroke="#fff" strokeWidth={2} radius={[10, 10, 0, 0]} />
-            <Bar dataKey="projected2030" name="2030 ($B)" fill="url(#projected2030)" stroke="#ff8c00" strokeWidth={2} radius={[10, 10, 0, 0]} />
+            <Bar dataKey="current" name="2024 ($B)" fill="url(#current2024)" stroke="#fff" strokeWidth={2} radius={[8, 8, 0, 0]} />
+            <Bar dataKey="projected2030" name="2030 ($B)" fill="url(#projected2030)" stroke="#ff8c00" strokeWidth={2} radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       )
@@ -307,16 +331,16 @@ const DataOwnershipIntro = () => {
               </filter>
             </defs>
             <CartesianGrid strokeDasharray="5 5" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
+            <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <Tooltip content={<CustomTooltip />} />
             <Line 
               type="monotone" 
               dataKey="meta" 
               name="Meta ARPU ($)" 
               stroke="#fff" 
-              strokeWidth={5} 
-              dot={{ r: 10, fill: '#fff', strokeWidth: 3, stroke: '#ff8c00' }}
+              strokeWidth={4} 
+              dot={{ r: 8, fill: '#fff', strokeWidth: 2, stroke: '#ff8c00' }}
               filter="url(#lineGlow2)"
             />
             <Line 
@@ -324,8 +348,8 @@ const DataOwnershipIntro = () => {
               dataKey="google" 
               name="Google ARPU ($)" 
               stroke="#ff8c00" 
-              strokeWidth={5} 
-              dot={{ r: 10, fill: '#ff8c00', strokeWidth: 3, stroke: '#fff' }}
+              strokeWidth={4} 
+              dot={{ r: 8, fill: '#ff8c00', strokeWidth: 2, stroke: '#fff' }}
               filter="url(#lineGlow2)"
             />
           </LineChart>
@@ -356,16 +380,16 @@ const DataOwnershipIntro = () => {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="5 5" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="scenario" stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
-            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: 16, fontWeight: 700 }} />
+            <XAxis dataKey="scenario" stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
+            <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="value" name="10-Year Value ($)" radius={[12, 12, 0, 0]}>
+            <Bar dataKey="value" name="10-Year Value ($)" radius={[8, 8, 0, 0]}>
               {tenYearValueData.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
                   fill={index === 0 ? 'url(#lowGradient)' : index === 1 ? 'url(#midGradient)' : 'url(#actualGradient)'}
                   stroke={index === 2 ? '#ff8c00' : '#fff'} 
-                  strokeWidth={3} 
+                  strokeWidth={2} 
                 />
               ))}
             </Bar>
@@ -377,92 +401,114 @@ const DataOwnershipIntro = () => {
 
   const currentSlideData = slides[currentSlide];
 
+  // Calculate heights to fit everything in viewport
+  // Mobile: 70px for continue button area
+  // Tablet: 80px for continue button area
+  // Desktop: No button, use full space
+  const buttonAreaHeight = isMobile ? 70 : isTablet ? 80 : 0;
+  const availableHeight = viewportHeight - buttonAreaHeight;
+  
+  // Distribute available height
+  const titleHeight = isMobile ? '15%' : isTablet ? '18%' : '20%';
+  const chartHeight = isMobile ? '55%' : isTablet ? '52%' : '55%';
+  const subtitleHeight = isMobile ? '8%' : isTablet ? '8%' : '8%';
+  const navHeight = isMobile ? '12%' : isTablet ? '12%' : '12%';
+
   return (
     <div style={{
       position: 'fixed',
       top: 0,
       left: 0,
       width: '100vw',
-      height: '100vh',
+      height: isMobile || isTablet ? `calc(100vh - ${buttonAreaHeight}px)` : '100vh',
+      maxHeight: isMobile || isTablet ? `calc(100vh - ${buttonAreaHeight}px)` : '100vh',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-start',
       background: 'transparent',
       padding: '0',
       margin: '0',
       overflow: 'hidden',
-      zIndex: 9999
+      zIndex: 10,
+      boxSizing: 'border-box'
     }}>
-      {/* Title at top - two lines, line 1=90pt, line 2=60pt, max-width 1200px */}
+      {/* Title at top */}
       <div style={{
-        padding: isMobile 
-          ? 'clamp(30px, 8vh, 80px) 20px 10px 20px' 
-          : isTablet 
-            ? 'clamp(40px, 10vh, 120px) 30px 15px 30px'
-            : 'clamp(60px, 15vh, 180px) 60px 20px 60px',
+        height: titleHeight,
+        minHeight: titleHeight,
+        padding: isMobile ? '15px 15px 5px 15px' : isTablet ? '20px 20px 8px 20px' : '30px 50px 10px 50px',
         textAlign: 'center',
         display: 'flex',
-        justifyContent: 'center'
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden'
       }}>
         <div style={{ maxWidth: '1200px', width: '100%' }}>
           <h1 style={{
-            fontSize: isMobile ? 'clamp(22px, 5.5vw, 36px)' : 'clamp(36px, 6.5vw, 85px)',
+            fontSize: isMobile ? 'clamp(16px, 4.5vw, 24px)' : isTablet ? 'clamp(24px, 3.5vw, 40px)' : 'clamp(36px, 5.5vw, 70px)',
             fontWeight: '900',
             color: '#fff',
             margin: '0',
             textShadow: '0 2px 15px rgba(0,0,0,0.45), 0 4px 30px rgba(0,0,0,0.35)',
-            lineHeight: isMobile ? '1.1' : '70pt',
-            letterSpacing: isMobile ? '-1px' : '-3px',
+            lineHeight: '1.05',
+            letterSpacing: '-1px',
             whiteSpace: isMobile ? 'normal' : 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'clip'
+            overflow: 'hidden'
           }}>
             {currentSlideData.title}
           </h1>
           <h1 style={{
-            fontSize: isMobile ? 'clamp(18px, 4.5vw, 28px)' : 'clamp(28px, 5vw, 65px)',
+            fontSize: isMobile ? 'clamp(14px, 3.8vw, 20px)' : isTablet ? 'clamp(20px, 3vw, 32px)' : 'clamp(28px, 4.5vw, 55px)',
             fontWeight: '900',
             color: '#fff',
             margin: '0',
             textShadow: '0 2px 15px rgba(0,0,0,0.45), 0 4px 30px rgba(0,0,0,0.35)',
-            lineHeight: isMobile ? '1.2' : 'calc(clamp(28px, 5vw, 65px) + 4pt)',
-            letterSpacing: isMobile ? '-1px' : '-3px',
+            lineHeight: '1.1',
+            letterSpacing: '-1px',
             whiteSpace: isMobile ? 'normal' : 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'clip'
+            overflow: 'hidden'
           }}>
             {currentSlideData.title2}
           </h1>
         </div>
       </div>
 
-      {/* Chart - max 1200px width, centered */}
+      {/* Chart */}
       <div style={{
+        height: chartHeight,
+        minHeight: chartHeight,
+        maxHeight: chartHeight,
         width: '100%',
-        height: isMobile ? '40vh' : isTablet ? '50vh' : '60vh',
-        maxHeight: isMobile ? '40vh' : isTablet ? '50vh' : '60vh',
-        padding: isMobile ? '0 15px' : isTablet ? '0 30px' : '0 60px',
+        padding: isMobile ? '0 8px' : isTablet ? '0 15px' : '0 40px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        overflow: 'hidden'
       }}>
         <div style={{
           width: '100%',
-          maxWidth: '1200px',
+          maxWidth: '1100px',
           height: '100%'
         }}>
           {currentSlideData.chart}
         </div>
       </div>
 
-      {/* Subtitle with inline circled info icon - 16px on 24pt line spacing */}
+      {/* Subtitle */}
       <div style={{
-        padding: isMobile ? '5px 20px 8px 20px' : isTablet ? '5px 30px 10px 30px' : '5px 60px 10px 60px',
-        textAlign: 'center'
+        height: subtitleHeight,
+        minHeight: subtitleHeight,
+        padding: isMobile ? '3px 12px' : isTablet ? '5px 20px' : '8px 50px',
+        textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden'
       }}>
         <p style={{
-          fontSize: isMobile ? 'clamp(11pt, 3vw, 14pt)' : 'clamp(14pt, 2vw, 18pt)',
-          lineHeight: isMobile ? 'clamp(14pt, 3.5vw, 18pt)' : 'clamp(20pt, 2.5vw, 24pt)',
+          fontSize: isMobile ? '10px' : isTablet ? '12px' : 'clamp(14px, 1.5vw, 16px)',
+          lineHeight: isMobile ? '13px' : isTablet ? '15px' : '20px',
           color: '#fff',
           margin: '0',
           textShadow: '0 2px 8px rgba(0,0,0,0.9)',
@@ -479,29 +525,17 @@ const DataOwnershipIntro = () => {
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '24px',
-              height: '24px',
+              width: isMobile ? '16px' : '20px',
+              height: isMobile ? '16px' : '20px',
               borderRadius: '50%',
               backgroundColor: '#ff8c00',
               color: '#fff',
-              fontSize: '14px',
+              fontSize: isMobile ? '10px' : '12px',
               fontWeight: 'bold',
               textDecoration: 'none',
-              transition: 'all 0.3s',
               verticalAlign: 'middle',
               marginLeft: '4px',
-              fontStyle: 'italic',
-              boxShadow: '0 2px 8px rgba(255, 140, 0, 0.6)'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#ff9900';
-              e.currentTarget.style.transform = 'scale(1.2)';
-              e.currentTarget.style.boxShadow = '0 4px 16px rgba(255, 140, 0, 0.9)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#ff8c00';
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 140, 0, 0.6)';
+              fontStyle: 'italic'
             }}
             title="View source"
           >
@@ -510,20 +544,22 @@ const DataOwnershipIntro = () => {
         </p>
       </div>
 
-      {/* Navigation - responsive bottom padding */}
+      {/* Navigation */}
       <div style={{
-        padding: isMobile 
-          ? '10px 20px clamp(20px, 5vh, 50px) 20px' 
-          : isTablet 
-            ? '15px 30px clamp(30px, 6vh, 70px) 30px'
-            : '20px 60px clamp(40px, 8vh, 100px) 60px',
-        textAlign: 'center'
+        height: navHeight,
+        minHeight: navHeight,
+        padding: isMobile ? '5px 12px 10px 12px' : isTablet ? '8px 20px 15px 20px' : '10px 50px 20px 50px',
+        textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden'
       }}>
         <div style={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          gap: isMobile ? '15px' : '30px'
+          gap: isMobile ? '10px' : isTablet ? '15px' : '20px'
         }}>
           <button
             onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
@@ -531,42 +567,36 @@ const DataOwnershipIntro = () => {
               background: 'rgba(255, 255, 255, 0.15)',
               border: '2px solid rgba(255, 255, 255, 0.4)',
               borderRadius: '50%',
-              width: isMobile ? '40px' : '54px',
-              height: isMobile ? '40px' : '54px',
+              width: isMobile ? '32px' : isTablet ? '38px' : '46px',
+              height: isMobile ? '32px' : isTablet ? '38px' : '46px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'all 0.3s',
-              backdropFilter: 'blur(10px)'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 140, 0, 0.4)';
-              e.currentTarget.style.borderColor = '#ff8c00';
-              e.currentTarget.style.transform = 'scale(1.1)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
-              e.currentTarget.style.transform = 'scale(1)';
+              backdropFilter: 'blur(10px)',
+              WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation'
             }}
           >
-            <ChevronLeft size={isMobile ? 22 : 30} color="white" strokeWidth={3} />
+            <ChevronLeft size={isMobile ? 16 : isTablet ? 20 : 24} color="white" strokeWidth={3} />
           </button>
 
-          <div style={{ display: 'flex', gap: isMobile ? '8px' : '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: isMobile ? '5px' : isTablet ? '7px' : '9px', alignItems: 'center' }}>
             {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
                 style={{
-                  height: isMobile ? '8px' : '10px',
-                  width: currentSlide === index ? (isMobile ? '24px' : '36px') : (isMobile ? '8px' : '10px'),
-                  borderRadius: isMobile ? '4px' : '5px',
+                  height: isMobile ? '5px' : isTablet ? '7px' : '9px',
+                  width: currentSlide === index ? (isMobile ? '15px' : isTablet ? '20px' : '28px') : (isMobile ? '5px' : isTablet ? '7px' : '9px'),
+                  borderRadius: '5px',
                   background: currentSlide === index ? '#ff8c00' : 'rgba(255, 255, 255, 0.5)',
                   border: 'none',
                   cursor: 'pointer',
-                  transition: 'all 0.3s'
+                  transition: 'all 0.3s',
+                  WebkitTapHighlightColor: 'transparent',
+                  touchAction: 'manipulation'
                 }}
               />
             ))}
@@ -578,49 +608,43 @@ const DataOwnershipIntro = () => {
               background: 'rgba(255, 255, 255, 0.15)',
               border: '2px solid rgba(255, 255, 255, 0.4)',
               borderRadius: '50%',
-              width: isMobile ? '40px' : '54px',
-              height: isMobile ? '40px' : '54px',
+              width: isMobile ? '32px' : isTablet ? '38px' : '46px',
+              height: isMobile ? '32px' : isTablet ? '38px' : '46px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'all 0.3s',
-              backdropFilter: 'blur(10px)'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 140, 0, 0.4)';
-              e.currentTarget.style.borderColor = '#ff8c00';
-              e.currentTarget.style.transform = 'scale(1.1)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
-              e.currentTarget.style.transform = 'scale(1)';
+              backdropFilter: 'blur(10px)',
+              WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation'
             }}
           >
-            <ChevronRight size={isMobile ? 22 : 30} color="white" strokeWidth={3} />
+            <ChevronRight size={isMobile ? 16 : isTablet ? 20 : 24} color="white" strokeWidth={3} />
           </button>
         </div>
       </div>
 
-      {/* Floating down arrow only (no text) - hidden on mobile/tablet where Continue button is used */}
-      <div style={{
-        position: 'absolute',
-        bottom: isMobile ? '60px' : '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        display: (isMobile || isTablet) ? 'none' : 'flex',
-        alignItems: 'center',
-        opacity: 0.7,
-        animation: 'bounce 2s infinite'
-      }}>
-        <ChevronDown size={32} color="#ff8c00" strokeWidth={3} />
-      </div>
+      {/* Down arrow - desktop only */}
+      {!isMobile && !isTablet && (
+        <div style={{
+          position: 'absolute',
+          bottom: '10px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          alignItems: 'center',
+          opacity: 0.7,
+          animation: 'bounce 2s infinite'
+        }}>
+          <ChevronDown size={24} color="#ff8c00" strokeWidth={3} />
+        </div>
+      )}
 
       <style>{`
         @keyframes bounce {
           0%, 100% { transform: translateX(-50%) translateY(0); }
-          50% { transform: translateX(-50%) translateY(10px); }
+          50% { transform: translateX(-50%) translateY(6px); }
         }
       `}</style>
     </div>
