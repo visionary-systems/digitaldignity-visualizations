@@ -581,7 +581,7 @@ const DataOwnershipIntro = () => {
     }
 
     // Desktop landscape (standard)
-    // Title sizes: 80px top line, 40px second line
+    // Title sizes: 100pt top line, 60pt second line
     // Max 40px gap between subtitle and selector (20px bottom + 20px top)
     return {
       buttonAreaHeight: 0,
@@ -593,8 +593,8 @@ const DataOwnershipIntro = () => {
       chartPadding: '0 40px',
       subtitlePadding: '0 50px 20px 50px',
       navPadding: '20px 50px 20px 50px',
-      titleFontSize: '80px',
-      title2FontSize: '40px',
+      titleFontSize: '100pt',
+      title2FontSize: '60pt',
       buttonSize: '46px',
       dotSize: '9px',
       dotActiveWidth: '28px',
