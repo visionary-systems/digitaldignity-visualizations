@@ -581,7 +581,7 @@ const DataOwnershipIntro = () => {
     }
 
     // Desktop landscape (standard)
-    // Title sizes: 100pt top line, 60pt second line
+    // Title sizes: 120pt top line, 80pt second line
     // Max 40px gap between subtitle and selector (20px bottom + 20px top)
     return {
       buttonAreaHeight: 0,
@@ -593,11 +593,11 @@ const DataOwnershipIntro = () => {
       chartPadding: '0 40px',
       subtitlePadding: '0 50px 20px 50px',
       navPadding: '20px 50px 20px 50px',
-      titleFontSize: '100pt',
-      title2FontSize: '60pt',
-      buttonSize: '46px',
-      dotSize: '9px',
-      dotActiveWidth: '28px',
+      titleFontSize: '120pt',
+      title2FontSize: '80pt',
+      buttonSize: '58px',
+      dotSize: '11px',
+      dotActiveWidth: '35px',
       containerMaxWidth: '100%',
       containerRightPadding: '0',
       chartMaxWidth: '1600px',
@@ -626,7 +626,7 @@ const DataOwnershipIntro = () => {
     WebkitUserSelect: 'none'
   };
 
-  const iconSize = isMobile ? 16 : isTablet && isPortrait ? 18 : isTablet ? 20 : 24;
+  const iconSize = isMobile ? 16 : isTablet && isPortrait ? 18 : isTablet ? 20 : 30;
 
   return (
     <div style={{
@@ -780,7 +780,7 @@ const DataOwnershipIntro = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          gap: isMobile ? '10px' : isTablet && isPortrait ? '12px' : isTablet ? '15px' : '20px'
+          gap: isMobile ? '10px' : isTablet && isPortrait ? '12px' : isTablet ? '15px' : '25px'
         }}>
           <button
             onClick={goToPrevSlide}
@@ -790,7 +790,7 @@ const DataOwnershipIntro = () => {
             <ChevronLeft size={iconSize} color="white" strokeWidth={3} />
           </button>
 
-          <div style={{ display: 'flex', gap: isMobile ? '5px' : isTablet && isPortrait ? '6px' : isTablet ? '7px' : '9px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: isMobile ? '5px' : isTablet && isPortrait ? '6px' : isTablet ? '7px' : '11px', alignItems: 'center' }}>
             {slides.map((_, index) => (
               <button
                 key={index}
