@@ -581,19 +581,19 @@ const DataOwnershipIntro = () => {
     }
 
     // Desktop landscape (standard)
-    // Title sizes: 80pt top line, 40pt second line
+    // Title sizes: 80px top line, 40px second line
     return {
       buttonAreaHeight: 0,
       titleHeight: '22%',
       chartHeight: '53%',
-      subtitleHeight: '8%',
+      subtitleHeight: '4%',
       navHeight: '12%',
       titlePadding: '30px 50px 10px 50px',
       chartPadding: '0 40px',
-      subtitlePadding: '8px 50px',
-      navPadding: '20px',
-      titleFontSize: '80pt',
-      title2FontSize: '40pt',
+      subtitlePadding: '4px 50px',
+      navPadding: '10px',
+      titleFontSize: '80px',
+      title2FontSize: '40px',
       buttonSize: '46px',
       dotSize: '9px',
       dotActiveWidth: '28px',
