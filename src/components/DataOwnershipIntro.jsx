@@ -727,42 +727,48 @@ const DataOwnershipIntro = () => {
         justifyContent: 'center',
         overflow: 'hidden'
       }}>
-        <p style={{
-          fontSize: isMobile ? '10px' : isTablet && isPortrait ? '11px' : isTablet ? '12px' : 'clamp(14px, 1.5vw, 16px)',
-          lineHeight: isMobile ? '13px' : isTablet ? '15px' : '20px',
-          color: '#fff',
-          margin: '0',
-          textShadow: '0 2px 8px rgba(0,0,0,0.9)',
-          opacity: 0.95,
-          display: 'inline'
+        <div style={{
+          background: 'rgba(0, 0, 0, 0.6)',
+          padding: '20pt',
+          borderRadius: '12px'
         }}>
-          {currentSlideData.subtitle}
-          {' '}
-          <a
-            href={currentSlideData.source}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: isMobile ? '16px' : '20px',
-              height: isMobile ? '16px' : '20px',
-              borderRadius: '50%',
-              backgroundColor: '#ff8c00',
-              color: '#fff',
-              fontSize: isMobile ? '10px' : '12px',
-              fontWeight: 'bold',
-              textDecoration: 'none',
-              verticalAlign: 'middle',
-              marginLeft: '4px',
-              fontStyle: 'italic'
-            }}
-            title="View source"
-          >
-            i
-          </a>
-        </p>
+          <p style={{
+            fontSize: isMobile ? '10px' : isTablet && isPortrait ? '11px' : isTablet ? '12px' : 'clamp(14px, 1.5vw, 16px)',
+            lineHeight: isMobile ? '13px' : isTablet ? '15px' : '20px',
+            color: '#fff',
+            margin: '0',
+            textShadow: '0 2px 8px rgba(0,0,0,0.9)',
+            opacity: 0.95,
+            display: 'inline'
+          }}>
+            {currentSlideData.subtitle}
+            {' '}
+            <a
+              href={currentSlideData.source}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: isMobile ? '16px' : '20px',
+                height: isMobile ? '16px' : '20px',
+                borderRadius: '50%',
+                backgroundColor: '#ff8c00',
+                color: '#fff',
+                fontSize: isMobile ? '10px' : '12px',
+                fontWeight: 'bold',
+                textDecoration: 'none',
+                verticalAlign: 'middle',
+                marginLeft: '4px',
+                fontStyle: 'italic'
+              }}
+              title="View source"
+            >
+              i
+            </a>
+          </p>
+        </div>
       </div>
 
       {/* Navigation - onClick only to prevent double-firing in Chrome */}
