@@ -83,7 +83,7 @@ const DataOwnershipIntro = () => {
     };
   }, []);
 
-  // Navigation handlers with both click and pointer events for Chrome compatibility
+  // Navigation handlers - using onClick only to prevent double-firing
   const goToPrevSlide = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -457,7 +457,7 @@ const DataOwnershipIntro = () => {
       const rightPadding = 15; // 15pt padding on right
       const maxWidthPercent = 80; // 80% max width
 
-      // Portrait tablet - scaled from desktop 80pt/50pt, centered charts
+      // Portrait tablet - 60px/35px titles, 80% max chart width
       if (isTablet) {
         return {
           buttonAreaHeight: 70,
@@ -468,21 +468,21 @@ const DataOwnershipIntro = () => {
           titlePadding: '15px 15px 5px 15px',
           chartPadding: '0 15px',
           subtitlePadding: '3px 15px',
-          navPadding: '5px 15px 10px 15px',
-          titleFontSize: '45pt',
-          title2FontSize: '30pt',
+          navPadding: '20px',
+          titleFontSize: '60px',
+          title2FontSize: '35px',
           buttonSize: '34px',
           dotSize: '6px',
           dotActiveWidth: '18px',
-          // Portrait-specific width constraints - centered
+          // Portrait-specific width constraints - 80% max
           containerMaxWidth: '100%',
           containerRightPadding: '0',
-          chartMaxWidth: '100%',
-          isPortraitLayout: false
+          chartMaxWidth: '80%',
+          isPortraitLayout: true
         };
       }
 
-      // Portrait mobile - scaled from desktop 80pt/50pt, centered charts
+      // Portrait mobile - 60px/35px titles, 80% max chart width
       if (isMobile) {
         return {
           buttonAreaHeight: 70,
@@ -493,21 +493,21 @@ const DataOwnershipIntro = () => {
           titlePadding: '15px 15px 5px 15px',
           chartPadding: '0 12px',
           subtitlePadding: '3px 12px',
-          navPadding: '5px 12px 10px 12px',
-          titleFontSize: '32pt',
-          title2FontSize: '22pt',
+          navPadding: '20px',
+          titleFontSize: '60px',
+          title2FontSize: '35px',
           buttonSize: '32px',
           dotSize: '5px',
           dotActiveWidth: '15px',
-          // Portrait mobile - centered charts
+          // Portrait mobile - 80% max chart width
           containerMaxWidth: '100%',
           containerRightPadding: '0',
-          chartMaxWidth: '100%',
-          isPortraitLayout: false
+          chartMaxWidth: '80%',
+          isPortraitLayout: true
         };
       }
 
-      // Portrait desktop (rare but possible - rotated monitor) - scaled from 80pt/50pt
+      // Portrait desktop (rare but possible - rotated monitor) - 60px/35px titles, 80% max
       return {
         buttonAreaHeight: 0,
         titleHeight: '20%',
@@ -517,22 +517,22 @@ const DataOwnershipIntro = () => {
         titlePadding: '25px 30px 10px 30px',
         chartPadding: '0 30px',
         subtitlePadding: '8px 30px',
-        navPadding: '10px 30px 15px 30px',
-        titleFontSize: '65pt',
-        title2FontSize: '42pt',
+        navPadding: '20px',
+        titleFontSize: '60px',
+        title2FontSize: '35px',
         buttonSize: '42px',
         dotSize: '8px',
         dotActiveWidth: '24px',
-        // Portrait desktop - centered charts
+        // Portrait desktop - 80% max chart width
         containerMaxWidth: '100%',
         containerRightPadding: '0',
-        chartMaxWidth: '100%',
-        isPortraitLayout: false
+        chartMaxWidth: '80%',
+        isPortraitLayout: true
       };
     }
 
     // LANDSCAPE MODE - full width available
-    // Landscape tablet - scaled down from desktop 80pt/50pt
+    // Landscape tablet - scaled down from desktop 80pt/40pt
     if (isTablet) {
       return {
         buttonAreaHeight: 80,
@@ -543,9 +543,9 @@ const DataOwnershipIntro = () => {
         titlePadding: '20px 20px 8px 20px',
         chartPadding: '0 15px',
         subtitlePadding: '5px 20px',
-        navPadding: '8px 20px 15px 20px',
+        navPadding: '20px',
         titleFontSize: '55pt',
-        title2FontSize: '35pt',
+        title2FontSize: '30pt',
         buttonSize: '38px',
         dotSize: '7px',
         dotActiveWidth: '20px',
@@ -556,7 +556,7 @@ const DataOwnershipIntro = () => {
       };
     }
 
-    // Landscape mobile - scaled down from desktop 80pt/50pt
+    // Landscape mobile - scaled down from desktop 80pt/40pt
     if (isMobile) {
       return {
         buttonAreaHeight: 70,
@@ -567,9 +567,9 @@ const DataOwnershipIntro = () => {
         titlePadding: '10px 15px 5px 15px',
         chartPadding: '0 8px',
         subtitlePadding: '3px 12px',
-        navPadding: '5px 12px 10px 12px',
+        navPadding: '20px',
         titleFontSize: '28pt',
-        title2FontSize: '18pt',
+        title2FontSize: '16pt',
         buttonSize: '30px',
         dotSize: '5px',
         dotActiveWidth: '15px',
@@ -581,7 +581,7 @@ const DataOwnershipIntro = () => {
     }
 
     // Desktop landscape (standard)
-    // Title sizes: 80pt top line, 50pt second line (requested spec)
+    // Title sizes: 80pt top line, 40pt second line
     return {
       buttonAreaHeight: 0,
       titleHeight: '22%',
@@ -591,22 +591,22 @@ const DataOwnershipIntro = () => {
       titlePadding: '30px 50px 10px 50px',
       chartPadding: '0 40px',
       subtitlePadding: '8px 50px',
-      navPadding: '10px 50px 20px 50px',
+      navPadding: '20px',
       titleFontSize: '80pt',
-      title2FontSize: '50pt',
+      title2FontSize: '40pt',
       buttonSize: '46px',
       dotSize: '9px',
       dotActiveWidth: '28px',
       containerMaxWidth: '100%',
       containerRightPadding: '0',
-      chartMaxWidth: '1100px',
+      chartMaxWidth: '1600px',
       isPortraitLayout: false
     };
   };
 
   const layout = getLayoutValues();
 
-  // Button styles with both click and pointer events
+  // Button styles for navigation
   const navButtonStyle = {
     background: 'rgba(255, 255, 255, 0.15)',
     border: '2px solid rgba(255, 255, 255, 0.4)',
@@ -764,7 +764,7 @@ const DataOwnershipIntro = () => {
         </p>
       </div>
 
-      {/* Navigation - using onPointerDown for better Chrome support */}
+      {/* Navigation - onClick only to prevent double-firing in Chrome */}
       <div style={{
         height: layout.navHeight,
         minHeight: layout.navHeight,
@@ -783,8 +783,8 @@ const DataOwnershipIntro = () => {
         }}>
           <button
             onClick={goToPrevSlide}
-            onPointerDown={goToPrevSlide}
             style={navButtonStyle}
+            aria-label="Previous slide"
           >
             <ChevronLeft size={iconSize} color="white" strokeWidth={3} />
           </button>
@@ -794,7 +794,8 @@ const DataOwnershipIntro = () => {
               <button
                 key={index}
                 onClick={goToSlide(index)}
-                onPointerDown={goToSlide(index)}
+                aria-label={`Go to slide ${index + 1}`}
+                aria-current={currentSlide === index ? 'true' : undefined}
                 style={{
                   height: layout.dotSize,
                   width: currentSlide === index ? layout.dotActiveWidth : layout.dotSize,
@@ -812,8 +813,8 @@ const DataOwnershipIntro = () => {
 
           <button
             onClick={goToNextSlide}
-            onPointerDown={goToNextSlide}
             style={navButtonStyle}
+            aria-label="Next slide"
           >
             <ChevronRight size={iconSize} color="white" strokeWidth={3} />
           </button>
