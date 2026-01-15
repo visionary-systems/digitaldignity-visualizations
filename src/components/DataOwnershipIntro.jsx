@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { Bar, BarChart, Line, LineChart, Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -6,35 +6,49 @@ const DataOwnershipIntro = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+  const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
+  const [scale, setScale] = useState(1);
 
-  // Device detection on mount and resize
+  // Get URL parameters for external control
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const scaleParam = params.get('scale');
+    if (scaleParam) {
+      setScale(parseFloat(scaleParam));
+    }
+  }, []);
+
+  // Device and orientation detection
   useEffect(() => {
     const checkDevice = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      // Detect touch capability for tablets
       const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-      
+      const portrait = height > width;
+
       setIsMobile(width <= 768);
       setIsTablet((width > 768 && width <= 1366 && isTouch) || (width > 768 && width <= 1024));
+      setIsPortrait(portrait);
       setViewportHeight(height);
-      
-      console.log('DataOwnershipIntro: Device check - width:', width, 'height:', height, 'mobile:', width <= 768, 'tablet:', (width > 768 && width <= 1366 && isTouch));
+      setViewportWidth(width);
+
+      console.log('DataOwnershipIntro: Device check - width:', width, 'height:', height, 'portrait:', portrait, 'mobile:', width <= 768, 'tablet:', (width > 768 && width <= 1366), 'maxWidth:', portrait ? '80%' : '100%');
     };
-    
+
     checkDevice();
-    
+
     document.body.style.background = 'transparent';
     document.body.style.overflow = 'hidden';
     document.body.style.margin = '0';
     document.body.style.padding = '0';
-    
+
     const htmlEl = document.documentElement;
     if (htmlEl) {
       htmlEl.style.overflow = 'hidden';
     }
-    
+
     const appDiv = document.querySelector('.App');
     if (appDiv) {
       appDiv.style.background = 'transparent';
@@ -42,25 +56,50 @@ const DataOwnershipIntro = () => {
       appDiv.style.maxHeight = '100vh';
       appDiv.style.overflow = 'hidden';
     }
-    
+
     // Listen for reset messages from parent iframe
     const handleMessage = (event) => {
       if (event.data && event.data.type === 'resetSlideshow') {
         console.log('DataOwnershipIntro: Received reset message');
         setCurrentSlide(0);
       }
+      // Allow parent to set scale
+      if (event.data && event.data.type === 'setScale') {
+        setScale(event.data.scale || 1);
+      }
     };
-    
+
     window.addEventListener('resize', checkDevice);
+    window.addEventListener('orientationchange', checkDevice);
     window.addEventListener('message', handleMessage);
-    
+
     return () => {
       document.body.style.background = '';
       document.body.style.overflow = '';
       if (htmlEl) htmlEl.style.overflow = '';
       window.removeEventListener('resize', checkDevice);
+      window.removeEventListener('orientationchange', checkDevice);
       window.removeEventListener('message', handleMessage);
     };
+  }, []);
+
+  // Navigation handlers with both click and pointer events for Chrome compatibility
+  const goToPrevSlide = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentSlide((prev) => (prev - 1 + 7) % 7);
+  }, []);
+
+  const goToNextSlide = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentSlide((prev) => (prev + 1) % 7);
+  }, []);
+
+  const goToSlide = useCallback((index) => (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentSlide(index);
   }, []);
 
   // Enhanced Tooltip with better styling
@@ -141,7 +180,15 @@ const DataOwnershipIntro = () => {
     { scenario: 'Actual', value: 20000 }
   ];
 
-  const tickFontSize = isMobile ? 10 : isTablet ? 12 : 14;
+  // Responsive sizing based on device AND orientation
+  const getTickFontSize = () => {
+    if (isMobile) return 10;
+    if (isTablet && isPortrait) return 10; // Smaller for portrait tablet
+    if (isTablet) return 12;
+    return 14;
+  };
+
+  const tickFontSize = getTickFontSize();
 
   const slides = [
     {
@@ -170,13 +217,13 @@ const DataOwnershipIntro = () => {
             <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Area 
-              type="monotone" 
-              dataKey="value" 
-              name="Market Value ($B)" 
-              stroke="#ff8c00" 
-              strokeWidth={3} 
-              fillOpacity={1} 
+            <Area
+              type="monotone"
+              dataKey="value"
+              name="Market Value ($B)"
+              stroke="#ff8c00"
+              strokeWidth={3}
+              fillOpacity={1}
               fill="url(#marketGradient)"
               filter="url(#glow)"
             />
@@ -202,12 +249,12 @@ const DataOwnershipIntro = () => {
             <XAxis dataKey="company" stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar 
-              dataKey="daily" 
-              name="Daily Profit ($M)" 
-              fill="url(#barGradient)" 
-              stroke="#ff8c00" 
-              strokeWidth={2} 
+            <Bar
+              dataKey="daily"
+              name="Daily Profit ($M)"
+              fill="url(#barGradient)"
+              stroke="#ff8c00"
+              strokeWidth={2}
               radius={[8, 8, 0, 0]}
             />
           </BarChart>
@@ -263,22 +310,22 @@ const DataOwnershipIntro = () => {
             <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Line 
-              type="monotone" 
-              dataKey="ai" 
+            <Line
+              type="monotone"
+              dataKey="ai"
               name="AI Market ($B)"
-              stroke="#ff8c00" 
-              strokeWidth={4} 
-              dot={{ r: 6, fill: '#ff8c00', strokeWidth: 2, stroke: '#fff' }} 
+              stroke="#ff8c00"
+              strokeWidth={4}
+              dot={{ r: 6, fill: '#ff8c00', strokeWidth: 2, stroke: '#fff' }}
               filter="url(#lineGlow)"
             />
-            <Line 
-              type="monotone" 
-              dataKey="data" 
+            <Line
+              type="monotone"
+              dataKey="data"
               name="Data Market ($B)"
-              stroke="#fff" 
-              strokeWidth={4} 
-              dot={{ r: 6, fill: '#fff', strokeWidth: 2, stroke: '#ff8c00' }} 
+              stroke="#fff"
+              strokeWidth={4}
+              dot={{ r: 6, fill: '#fff', strokeWidth: 2, stroke: '#ff8c00' }}
               filter="url(#lineGlow)"
             />
           </LineChart>
@@ -334,21 +381,21 @@ const DataOwnershipIntro = () => {
             <XAxis dataKey="year" stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <YAxis stroke="#fff" tick={{ fill: '#fff', fontSize: tickFontSize, fontWeight: 700 }} />
             <Tooltip content={<CustomTooltip />} />
-            <Line 
-              type="monotone" 
-              dataKey="meta" 
-              name="Meta ARPU ($)" 
-              stroke="#fff" 
-              strokeWidth={4} 
+            <Line
+              type="monotone"
+              dataKey="meta"
+              name="Meta ARPU ($)"
+              stroke="#fff"
+              strokeWidth={4}
               dot={{ r: 8, fill: '#fff', strokeWidth: 2, stroke: '#ff8c00' }}
               filter="url(#lineGlow2)"
             />
-            <Line 
-              type="monotone" 
-              dataKey="google" 
-              name="Google ARPU ($)" 
-              stroke="#ff8c00" 
-              strokeWidth={4} 
+            <Line
+              type="monotone"
+              dataKey="google"
+              name="Google ARPU ($)"
+              stroke="#ff8c00"
+              strokeWidth={4}
               dot={{ r: 8, fill: '#ff8c00', strokeWidth: 2, stroke: '#fff' }}
               filter="url(#lineGlow2)"
             />
@@ -385,11 +432,11 @@ const DataOwnershipIntro = () => {
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="value" name="10-Year Value ($)" radius={[8, 8, 0, 0]}>
               {tenYearValueData.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
+                <Cell
+                  key={`cell-${index}`}
                   fill={index === 0 ? 'url(#lowGradient)' : index === 1 ? 'url(#midGradient)' : 'url(#actualGradient)'}
-                  stroke={index === 2 ? '#ff8c00' : '#fff'} 
-                  strokeWidth={2} 
+                  stroke={index === 2 ? '#ff8c00' : '#fff'}
+                  strokeWidth={2}
                 />
               ))}
             </Bar>
@@ -401,42 +448,214 @@ const DataOwnershipIntro = () => {
 
   const currentSlideData = slides[currentSlide];
 
-  // Calculate heights to fit everything in viewport
-  // Mobile: 70px for continue button area
-  // Tablet: 80px for continue button area
-  // Desktop: No button, use full space
-  const buttonAreaHeight = isMobile ? 70 : isTablet ? 80 : 0;
-  const availableHeight = viewportHeight - buttonAreaHeight;
-  
-  // Distribute available height
-  const titleHeight = isMobile ? '15%' : isTablet ? '18%' : '20%';
-  const chartHeight = isMobile ? '55%' : isTablet ? '52%' : '55%';
-  const subtitleHeight = isMobile ? '8%' : isTablet ? '8%' : '8%';
-  const navHeight = isMobile ? '12%' : isTablet ? '12%' : '12%';
+  // Calculate layout based on device, orientation, and scale
+  // PORTRAIT RULE: Max 80% width with 15pt right padding
+  const getLayoutValues = () => {
+    // Portrait mode - any device in vertical orientation
+    // Max 80% of available width with 15pt (15px) right padding built in
+    if (isPortrait) {
+      const rightPadding = 15; // 15pt padding on right
+      const maxWidthPercent = 80; // 80% max width
+
+      // Portrait tablet - scaled from desktop 80pt/50pt, centered charts
+      if (isTablet) {
+        return {
+          buttonAreaHeight: 70,
+          titleHeight: '16%',
+          chartHeight: '52%',
+          subtitleHeight: '8%',
+          navHeight: '10%',
+          titlePadding: '15px 15px 5px 15px',
+          chartPadding: '0 15px',
+          subtitlePadding: '3px 15px',
+          navPadding: '5px 15px 10px 15px',
+          titleFontSize: '45pt',
+          title2FontSize: '30pt',
+          buttonSize: '34px',
+          dotSize: '6px',
+          dotActiveWidth: '18px',
+          // Portrait-specific width constraints - centered
+          containerMaxWidth: '100%',
+          containerRightPadding: '0',
+          chartMaxWidth: '100%',
+          isPortraitLayout: false
+        };
+      }
+
+      // Portrait mobile - scaled from desktop 80pt/50pt, centered charts
+      if (isMobile) {
+        return {
+          buttonAreaHeight: 70,
+          titleHeight: '16%',
+          chartHeight: '55%',
+          subtitleHeight: '8%',
+          navHeight: '12%',
+          titlePadding: '15px 15px 5px 15px',
+          chartPadding: '0 12px',
+          subtitlePadding: '3px 12px',
+          navPadding: '5px 12px 10px 12px',
+          titleFontSize: '32pt',
+          title2FontSize: '22pt',
+          buttonSize: '32px',
+          dotSize: '5px',
+          dotActiveWidth: '15px',
+          // Portrait mobile - centered charts
+          containerMaxWidth: '100%',
+          containerRightPadding: '0',
+          chartMaxWidth: '100%',
+          isPortraitLayout: false
+        };
+      }
+
+      // Portrait desktop (rare but possible - rotated monitor) - scaled from 80pt/50pt
+      return {
+        buttonAreaHeight: 0,
+        titleHeight: '20%',
+        chartHeight: '52%',
+        subtitleHeight: '8%',
+        navHeight: '12%',
+        titlePadding: '25px 30px 10px 30px',
+        chartPadding: '0 30px',
+        subtitlePadding: '8px 30px',
+        navPadding: '10px 30px 15px 30px',
+        titleFontSize: '65pt',
+        title2FontSize: '42pt',
+        buttonSize: '42px',
+        dotSize: '8px',
+        dotActiveWidth: '24px',
+        // Portrait desktop - centered charts
+        containerMaxWidth: '100%',
+        containerRightPadding: '0',
+        chartMaxWidth: '100%',
+        isPortraitLayout: false
+      };
+    }
+
+    // LANDSCAPE MODE - full width available
+    // Landscape tablet - scaled down from desktop 80pt/50pt
+    if (isTablet) {
+      return {
+        buttonAreaHeight: 80,
+        titleHeight: '20%',
+        chartHeight: '52%',
+        subtitleHeight: '8%',
+        navHeight: '12%',
+        titlePadding: '20px 20px 8px 20px',
+        chartPadding: '0 15px',
+        subtitlePadding: '5px 20px',
+        navPadding: '8px 20px 15px 20px',
+        titleFontSize: '55pt',
+        title2FontSize: '35pt',
+        buttonSize: '38px',
+        dotSize: '7px',
+        dotActiveWidth: '20px',
+        containerMaxWidth: '100%',
+        containerRightPadding: '0',
+        chartMaxWidth: '100%',
+        isPortraitLayout: false
+      };
+    }
+
+    // Landscape mobile - scaled down from desktop 80pt/50pt
+    if (isMobile) {
+      return {
+        buttonAreaHeight: 70,
+        titleHeight: '18%',
+        chartHeight: '55%',
+        subtitleHeight: '8%',
+        navHeight: '12%',
+        titlePadding: '10px 15px 5px 15px',
+        chartPadding: '0 8px',
+        subtitlePadding: '3px 12px',
+        navPadding: '5px 12px 10px 12px',
+        titleFontSize: '28pt',
+        title2FontSize: '18pt',
+        buttonSize: '30px',
+        dotSize: '5px',
+        dotActiveWidth: '15px',
+        containerMaxWidth: '100%',
+        containerRightPadding: '0',
+        chartMaxWidth: '100%',
+        isPortraitLayout: false
+      };
+    }
+
+    // Desktop landscape (standard)
+    // Title sizes: 80pt top line, 50pt second line (requested spec)
+    return {
+      buttonAreaHeight: 0,
+      titleHeight: '22%',
+      chartHeight: '53%',
+      subtitleHeight: '8%',
+      navHeight: '12%',
+      titlePadding: '30px 50px 10px 50px',
+      chartPadding: '0 40px',
+      subtitlePadding: '8px 50px',
+      navPadding: '10px 50px 20px 50px',
+      titleFontSize: '80pt',
+      title2FontSize: '50pt',
+      buttonSize: '46px',
+      dotSize: '9px',
+      dotActiveWidth: '28px',
+      containerMaxWidth: '100%',
+      containerRightPadding: '0',
+      chartMaxWidth: '1100px',
+      isPortraitLayout: false
+    };
+  };
+
+  const layout = getLayoutValues();
+
+  // Button styles with both click and pointer events
+  const navButtonStyle = {
+    background: 'rgba(255, 255, 255, 0.15)',
+    border: '2px solid rgba(255, 255, 255, 0.4)',
+    borderRadius: '50%',
+    width: layout.buttonSize,
+    height: layout.buttonSize,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    transition: 'all 0.3s',
+    backdropFilter: 'blur(10px)',
+    WebkitTapHighlightColor: 'transparent',
+    touchAction: 'manipulation',
+    userSelect: 'none',
+    WebkitUserSelect: 'none'
+  };
+
+  const iconSize = isMobile ? 16 : isTablet && isPortrait ? 18 : isTablet ? 20 : 24;
 
   return (
     <div style={{
       position: 'fixed',
       top: 0,
       left: 0,
-      width: '100vw',
-      height: isMobile || isTablet ? `calc(100vh - ${buttonAreaHeight}px)` : '100vh',
-      maxHeight: isMobile || isTablet ? `calc(100vh - ${buttonAreaHeight}px)` : '100vh',
+      // Portrait: max 80% width, Landscape: full width
+      width: layout.isPortraitLayout ? layout.containerMaxWidth : '100vw',
+      maxWidth: layout.isPortraitLayout ? layout.containerMaxWidth : '100vw',
+      height: isMobile || isTablet ? `calc(100vh - ${layout.buttonAreaHeight}px)` : '100vh',
+      maxHeight: isMobile || isTablet ? `calc(100vh - ${layout.buttonAreaHeight}px)` : '100vh',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'flex-start',
       background: 'transparent',
       padding: '0',
+      // 15pt right padding for portrait mode
+      paddingRight: layout.containerRightPadding,
       margin: '0',
       overflow: 'hidden',
       zIndex: 10,
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      transform: scale !== 1 ? `scale(${scale})` : 'none',
+      transformOrigin: 'top left'
     }}>
       {/* Title at top */}
       <div style={{
-        height: titleHeight,
-        minHeight: titleHeight,
-        padding: isMobile ? '15px 15px 5px 15px' : isTablet ? '20px 20px 8px 20px' : '30px 50px 10px 50px',
+        height: layout.titleHeight,
+        minHeight: layout.titleHeight,
+        padding: layout.titlePadding,
         textAlign: 'center',
         display: 'flex',
         flexDirection: 'column',
@@ -446,27 +665,27 @@ const DataOwnershipIntro = () => {
       }}>
         <div style={{ maxWidth: '1200px', width: '100%' }}>
           <h1 style={{
-            fontSize: isMobile ? 'clamp(16px, 4.5vw, 24px)' : isTablet ? 'clamp(24px, 3.5vw, 40px)' : 'clamp(36px, 5.5vw, 70px)',
+            fontSize: layout.titleFontSize,
             fontWeight: '900',
             color: '#fff',
             margin: '0',
             textShadow: '0 2px 15px rgba(0,0,0,0.45), 0 4px 30px rgba(0,0,0,0.35)',
             lineHeight: '1.05',
             letterSpacing: '-1px',
-            whiteSpace: isMobile ? 'normal' : 'nowrap',
+            whiteSpace: isMobile || (isTablet && isPortrait) ? 'normal' : 'nowrap',
             overflow: 'hidden'
           }}>
             {currentSlideData.title}
           </h1>
           <h1 style={{
-            fontSize: isMobile ? 'clamp(14px, 3.8vw, 20px)' : isTablet ? 'clamp(20px, 3vw, 32px)' : 'clamp(28px, 4.5vw, 55px)',
+            fontSize: layout.title2FontSize,
             fontWeight: '900',
             color: '#fff',
             margin: '0',
             textShadow: '0 2px 15px rgba(0,0,0,0.45), 0 4px 30px rgba(0,0,0,0.35)',
             lineHeight: '1.1',
             letterSpacing: '-1px',
-            whiteSpace: isMobile ? 'normal' : 'nowrap',
+            whiteSpace: isMobile || (isTablet && isPortrait) ? 'normal' : 'nowrap',
             overflow: 'hidden'
           }}>
             {currentSlideData.title2}
@@ -474,21 +693,22 @@ const DataOwnershipIntro = () => {
         </div>
       </div>
 
-      {/* Chart */}
+      {/* Chart - always centered */}
       <div style={{
-        height: chartHeight,
-        minHeight: chartHeight,
-        maxHeight: chartHeight,
+        height: layout.chartHeight,
+        minHeight: layout.chartHeight,
+        maxHeight: layout.chartHeight,
         width: '100%',
-        padding: isMobile ? '0 8px' : isTablet ? '0 15px' : '0 40px',
+        padding: layout.chartPadding,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        boxSizing: 'border-box'
       }}>
         <div style={{
           width: '100%',
-          maxWidth: '1100px',
+          maxWidth: layout.chartMaxWidth,
           height: '100%'
         }}>
           {currentSlideData.chart}
@@ -497,9 +717,9 @@ const DataOwnershipIntro = () => {
 
       {/* Subtitle */}
       <div style={{
-        height: subtitleHeight,
-        minHeight: subtitleHeight,
-        padding: isMobile ? '3px 12px' : isTablet ? '5px 20px' : '8px 50px',
+        height: layout.subtitleHeight,
+        minHeight: layout.subtitleHeight,
+        padding: layout.subtitlePadding,
         textAlign: 'center',
         display: 'flex',
         alignItems: 'center',
@@ -507,7 +727,7 @@ const DataOwnershipIntro = () => {
         overflow: 'hidden'
       }}>
         <p style={{
-          fontSize: isMobile ? '10px' : isTablet ? '12px' : 'clamp(14px, 1.5vw, 16px)',
+          fontSize: isMobile ? '10px' : isTablet && isPortrait ? '11px' : isTablet ? '12px' : 'clamp(14px, 1.5vw, 16px)',
           lineHeight: isMobile ? '13px' : isTablet ? '15px' : '20px',
           color: '#fff',
           margin: '0',
@@ -517,9 +737,9 @@ const DataOwnershipIntro = () => {
         }}>
           {currentSlideData.subtitle}
           {' '}
-          <a 
-            href={currentSlideData.source} 
-            target="_blank" 
+          <a
+            href={currentSlideData.source}
+            target="_blank"
             rel="noopener noreferrer"
             style={{
               display: 'inline-flex',
@@ -544,11 +764,11 @@ const DataOwnershipIntro = () => {
         </p>
       </div>
 
-      {/* Navigation */}
+      {/* Navigation - using onPointerDown for better Chrome support */}
       <div style={{
-        height: navHeight,
-        minHeight: navHeight,
-        padding: isMobile ? '5px 12px 10px 12px' : isTablet ? '8px 20px 15px 20px' : '10px 50px 20px 50px',
+        height: layout.navHeight,
+        minHeight: layout.navHeight,
+        padding: layout.navPadding,
         textAlign: 'center',
         display: 'flex',
         alignItems: 'center',
@@ -559,37 +779,25 @@ const DataOwnershipIntro = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          gap: isMobile ? '10px' : isTablet ? '15px' : '20px'
+          gap: isMobile ? '10px' : isTablet && isPortrait ? '12px' : isTablet ? '15px' : '20px'
         }}>
           <button
-            onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
-            style={{
-              background: 'rgba(255, 255, 255, 0.15)',
-              border: '2px solid rgba(255, 255, 255, 0.4)',
-              borderRadius: '50%',
-              width: isMobile ? '32px' : isTablet ? '38px' : '46px',
-              height: isMobile ? '32px' : isTablet ? '38px' : '46px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              backdropFilter: 'blur(10px)',
-              WebkitTapHighlightColor: 'transparent',
-              touchAction: 'manipulation'
-            }}
+            onClick={goToPrevSlide}
+            onPointerDown={goToPrevSlide}
+            style={navButtonStyle}
           >
-            <ChevronLeft size={isMobile ? 16 : isTablet ? 20 : 24} color="white" strokeWidth={3} />
+            <ChevronLeft size={iconSize} color="white" strokeWidth={3} />
           </button>
 
-          <div style={{ display: 'flex', gap: isMobile ? '5px' : isTablet ? '7px' : '9px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: isMobile ? '5px' : isTablet && isPortrait ? '6px' : isTablet ? '7px' : '9px', alignItems: 'center' }}>
             {slides.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentSlide(index)}
+                onClick={goToSlide(index)}
+                onPointerDown={goToSlide(index)}
                 style={{
-                  height: isMobile ? '5px' : isTablet ? '7px' : '9px',
-                  width: currentSlide === index ? (isMobile ? '15px' : isTablet ? '20px' : '28px') : (isMobile ? '5px' : isTablet ? '7px' : '9px'),
+                  height: layout.dotSize,
+                  width: currentSlide === index ? layout.dotActiveWidth : layout.dotSize,
                   borderRadius: '5px',
                   background: currentSlide === index ? '#ff8c00' : 'rgba(255, 255, 255, 0.5)',
                   border: 'none',
@@ -603,24 +811,11 @@ const DataOwnershipIntro = () => {
           </div>
 
           <button
-            onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-            style={{
-              background: 'rgba(255, 255, 255, 0.15)',
-              border: '2px solid rgba(255, 255, 255, 0.4)',
-              borderRadius: '50%',
-              width: isMobile ? '32px' : isTablet ? '38px' : '46px',
-              height: isMobile ? '32px' : isTablet ? '38px' : '46px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              backdropFilter: 'blur(10px)',
-              WebkitTapHighlightColor: 'transparent',
-              touchAction: 'manipulation'
-            }}
+            onClick={goToNextSlide}
+            onPointerDown={goToNextSlide}
+            style={navButtonStyle}
           >
-            <ChevronRight size={isMobile ? 16 : isTablet ? 20 : 24} color="white" strokeWidth={3} />
+            <ChevronRight size={iconSize} color="white" strokeWidth={3} />
           </button>
         </div>
       </div>
