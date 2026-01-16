@@ -532,7 +532,7 @@ const DataOwnershipIntro = () => {
     }
 
     // LANDSCAPE MODE - full width available
-    // Landscape tablet - scaled down from desktop 80pt/40pt
+    // Landscape tablet - scaled down by 20% (0.8 scale)
     if (isTablet) {
       return {
         buttonAreaHeight: 80,
@@ -552,7 +552,8 @@ const DataOwnershipIntro = () => {
         containerMaxWidth: '100%',
         containerRightPadding: '0',
         chartMaxWidth: '100%',
-        isPortraitLayout: false
+        isPortraitLayout: false,
+        landscapeTabletScale: 0.8
       };
     }
 
@@ -649,8 +650,8 @@ const DataOwnershipIntro = () => {
       overflow: 'hidden',
       zIndex: 10,
       boxSizing: 'border-box',
-      transform: scale !== 1 ? `scale(${scale})` : 'none',
-      transformOrigin: 'top left'
+      transform: layout.landscapeTabletScale ? `scale(${layout.landscapeTabletScale})` : (scale !== 1 ? `scale(${scale})` : 'none'),
+      transformOrigin: 'top center'
     }}>
       {/* Title at top */}
       <div style={{
