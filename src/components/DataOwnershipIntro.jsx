@@ -538,7 +538,7 @@ const DataOwnershipIntro = () => {
       return {
         buttonAreaHeight: 80,
         titleHeight: '20%',
-        chartHeight: '60%',
+        chartHeight: '55%',
         subtitleHeight: '8%',
         navHeight: '12%',
         titlePadding: '20px 20px 8px 20px',
