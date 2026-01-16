@@ -534,6 +534,7 @@ const DataOwnershipIntro = () => {
     // LANDSCAPE MODE - full width available
     // Landscape tablet - titles 75pt/55pt, chart reduced by 20%
     if (isTablet) {
+      console.log('*** TABLET LANDSCAPE DETECTED - Using 75pt/55pt titles, 80% chart ***');
       return {
         buttonAreaHeight: 80,
         titleHeight: '20%',
