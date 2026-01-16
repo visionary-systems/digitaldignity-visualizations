@@ -542,7 +542,7 @@ const DataOwnershipIntro = () => {
         subtitleHeight: '8%',
         navHeight: '12%',
         titlePadding: '20px 20px 8px 20px',
-        chartPadding: '0 15px',
+        chartPadding: '40px 15px 0 15px',
         subtitlePadding: '5px 20px',
         navPadding: '20px',
         titleFontSize: '60pt',
