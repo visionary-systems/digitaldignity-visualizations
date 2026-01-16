@@ -532,28 +532,28 @@ const DataOwnershipIntro = () => {
     }
 
     // LANDSCAPE MODE - full width available
-    // Landscape tablet - scaled down by 20% (0.8 scale)
+    // Landscape tablet - titles 75pt/55pt, chart reduced by 20%
     if (isTablet) {
       return {
         buttonAreaHeight: 80,
         titleHeight: '20%',
-        chartHeight: '52%',
+        chartHeight: '42%',  // Reduced from 52% (20% reduction)
         subtitleHeight: '8%',
         navHeight: '12%',
         titlePadding: '20px 20px 8px 20px',
         chartPadding: '0 15px',
         subtitlePadding: '5px 20px',
         navPadding: '20px',
-        titleFontSize: '55pt',
-        title2FontSize: '30pt',
+        titleFontSize: '75pt',
+        title2FontSize: '55pt',
         buttonSize: '38px',
         dotSize: '7px',
         dotActiveWidth: '20px',
         containerMaxWidth: '100%',
         containerRightPadding: '0',
-        chartMaxWidth: '100%',
+        chartMaxWidth: '80%',  // 80% of width (20% reduction)
         isPortraitLayout: false,
-        landscapeTabletScale: 0.8
+        landscapeTabletScale: null  // Remove container scale, use chart sizing instead
       };
     }
 
