@@ -533,29 +533,28 @@ const DataOwnershipIntro = () => {
     }
 
     // LANDSCAPE MODE - full width available
-    // Landscape tablet - titles 75pt/55pt, chart reduced by 20%
+    // Landscape tablet - titles 60pt/40pt, chart 60% height
     if (isTablet) {
-      console.log('*** TABLET LANDSCAPE DETECTED - Using 75pt/55pt titles, 80% chart ***');
       return {
         buttonAreaHeight: 80,
         titleHeight: '20%',
-        chartHeight: '42%',  // Reduced from 52% (20% reduction)
+        chartHeight: '60%',
         subtitleHeight: '8%',
         navHeight: '12%',
         titlePadding: '20px 20px 8px 20px',
         chartPadding: '0 15px',
         subtitlePadding: '5px 20px',
         navPadding: '20px',
-        titleFontSize: '75pt',
-        title2FontSize: '55pt',
+        titleFontSize: '60pt',
+        title2FontSize: '40pt',
         buttonSize: '38px',
         dotSize: '7px',
         dotActiveWidth: '20px',
         containerMaxWidth: '100%',
         containerRightPadding: '0',
-        chartMaxWidth: '80%',  // 80% of width (20% reduction)
+        chartMaxWidth: '80%',
         isPortraitLayout: false,
-        landscapeTabletScale: null  // Remove container scale, use chart sizing instead
+        landscapeTabletScale: null
       };
     }
 
@@ -631,11 +630,6 @@ const DataOwnershipIntro = () => {
 
   const iconSize = isMobile ? 16 : isTablet && isPortrait ? 18 : isTablet ? 20 : 30;
 
-  // Debug mode detection
-  const debugMode = isTablet && !isPortrait ? 'TABLET-LANDSCAPE' :
-                    isTablet && isPortrait ? 'TABLET-PORTRAIT' :
-                    isMobile ? 'MOBILE' : 'DESKTOP';
-
   return (
     <div style={{
       position: 'fixed',
@@ -660,21 +654,6 @@ const DataOwnershipIntro = () => {
       transform: layout.landscapeTabletScale ? `scale(${layout.landscapeTabletScale})` : (scale !== 1 ? `scale(${scale})` : 'none'),
       transformOrigin: 'top center'
     }}>
-      {/* DEBUG: Temporary indicator - remove after testing */}
-      <div style={{
-        position: 'absolute',
-        top: '5px',
-        right: '5px',
-        background: debugMode === 'TABLET-LANDSCAPE' ? 'lime' : 'red',
-        color: 'black',
-        padding: '4px 8px',
-        fontSize: '10px',
-        fontWeight: 'bold',
-        borderRadius: '4px',
-        zIndex: 9999
-      }}>
-        {debugMode} | {viewportWidth}x{viewportHeight} | Title: {layout.titleFontSize}
-      </div>
       {/* Title at top */}
       <div style={{
         height: layout.titleHeight,
