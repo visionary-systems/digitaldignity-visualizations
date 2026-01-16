@@ -537,12 +537,12 @@ const DataOwnershipIntro = () => {
     if (isTablet) {
       return {
         buttonAreaHeight: 80,
-        titleHeight: '20%',
+        titleHeight: '16%',
         chartHeight: '55%',
         subtitleHeight: '8%',
         navHeight: '12%',
-        titlePadding: '20px 20px 8px 20px',
-        chartPadding: '40px 15px 0 15px',
+        titlePadding: '10px 20px 0 20px',
+        chartPadding: '20px 15px 0 15px',
         subtitlePadding: '5px 20px',
         navPadding: '20px',
         titleFontSize: '60pt',
