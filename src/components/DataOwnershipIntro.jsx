@@ -29,7 +29,8 @@ const DataOwnershipIntro = () => {
       const portrait = height > width;
 
       setIsMobile(width <= 768);
-      setIsTablet((width > 768 && width <= 1366 && isTouch) || (width > 768 && width <= 1024));
+      // Tablet: touch devices 768-1400px, or any device 768-1024px (for testing)
+      setIsTablet((width > 768 && width <= 1400 && isTouch) || (width > 768 && width <= 1024));
       setIsPortrait(portrait);
       setViewportHeight(height);
       setViewportWidth(width);
