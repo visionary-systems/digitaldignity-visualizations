@@ -630,6 +630,11 @@ const DataOwnershipIntro = () => {
 
   const iconSize = isMobile ? 16 : isTablet && isPortrait ? 18 : isTablet ? 20 : 30;
 
+  // Debug mode detection
+  const debugMode = isTablet && !isPortrait ? 'TABLET-LANDSCAPE' :
+                    isTablet && isPortrait ? 'TABLET-PORTRAIT' :
+                    isMobile ? 'MOBILE' : 'DESKTOP';
+
   return (
     <div style={{
       position: 'fixed',
@@ -654,6 +659,21 @@ const DataOwnershipIntro = () => {
       transform: layout.landscapeTabletScale ? `scale(${layout.landscapeTabletScale})` : (scale !== 1 ? `scale(${scale})` : 'none'),
       transformOrigin: 'top center'
     }}>
+      {/* DEBUG: Temporary indicator - remove after testing */}
+      <div style={{
+        position: 'absolute',
+        top: '5px',
+        right: '5px',
+        background: debugMode === 'TABLET-LANDSCAPE' ? 'lime' : 'red',
+        color: 'black',
+        padding: '4px 8px',
+        fontSize: '10px',
+        fontWeight: 'bold',
+        borderRadius: '4px',
+        zIndex: 9999
+      }}>
+        {debugMode} | {viewportWidth}x{viewportHeight} | Title: {layout.titleFontSize}
+      </div>
       {/* Title at top */}
       <div style={{
         height: layout.titleHeight,
